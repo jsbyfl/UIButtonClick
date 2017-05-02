@@ -76,7 +76,12 @@ static float k_acceptEventInterval = 1.0; //Btn间隔时间
         
         if (k_acceptEventInterval > 0) {
             self.BTN_ignoreEvent = YES;
-            [self performSelector:@selector(setBTN_ignoreEvent:) withObject:@(NO) afterDelay:k_acceptEventInterval];
+            
+            dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(k_acceptEventInterval * NSEC_PER_SEC));
+            dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                self.BTN_ignoreEvent = NO;
+            });
+            //[self performSelector:@selector(setBTN_ignoreEvent:) withObject:@(NO) afterDelay:k_acceptEventInterval];
         }
         [self __BTN_sendAction:action to:target forEvent:event];
     }
