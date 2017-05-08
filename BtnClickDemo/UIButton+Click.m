@@ -63,9 +63,16 @@ static float k_acceptEventInterval = 1.0; //Btn间隔时间
 #pragma mark -- sendAction --
 - (void)__BTN_sendAction:(SEL)action to:(id)target forEvent:(UIEvent *)event
 {
+    if (self.allControlEvents != UIControlEventTouchUpInside) {
+        //多个事件,不做防重处理
+        [self __BTN_sendAction:action to:target forEvent:event];
+        return;
+    }
+    
     if (self.BTN_forbidden_AvoidRepeatClick) {
         //禁止防重->直接调用
         [self __BTN_sendAction:action to:target forEvent:event];
+        return;
     }
     else{
         //开启防重功能
@@ -81,7 +88,6 @@ static float k_acceptEventInterval = 1.0; //Btn间隔时间
             dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 self.BTN_ignoreEvent = NO;
             });
-            //[self performSelector:@selector(setBTN_ignoreEvent:) withObject:@(NO) afterDelay:k_acceptEventInterval];
         }
         [self __BTN_sendAction:action to:target forEvent:event];
     }
